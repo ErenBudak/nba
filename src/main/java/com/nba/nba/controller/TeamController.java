@@ -1,40 +1,45 @@
 package com.nba.nba.controller;
 
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
+import com.nba.nba.entity.Game;
+import com.nba.nba.entity.Roster;
 import com.nba.nba.entity.Team;
-import com.nba.nba.repository.TeamRepository;
-import java.util.*;
+import com.nba.nba.service.GameService;
+import com.nba.nba.service.TeamService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/teams")
 public class TeamController {
-	private final TeamRepository repo;
-	public TeamController(TeamRepository repo) { this.repo = repo; }
+
+	@Autowired
+	private TeamService teamService;
+
+	@Autowired
+	private GameService gameService;
 
 	@GetMapping
-	public List<Team> all() { return repo.findAll(); }
+	public List<Team> getAllTeams() {
+		return teamService.getAllTeams();
+	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Team> get(@PathVariable Integer id) {
-		return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<Team> getTeamById(@PathVariable Integer id) {
+		return teamService.getTeamById(id)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
 	}
 
-	@PostMapping
-	public Team create(@RequestBody Team team) { return repo.save(team); }
-
-	@PutMapping("/{id}")
-	public ResponseEntity<Team> update(@PathVariable Integer id, @RequestBody Team t) {
-		return repo.findById(id).map(existing -> {
-			t.setId(existing.getId());
-			return ResponseEntity.ok(repo.save(t));
-		}).orElse(ResponseEntity.notFound().build());
+	@GetMapping("/{id}/roster")
+	public List<Roster> getRoster(@PathVariable Integer id, @RequestParam Integer seasonId) {
+		return teamService.getRoster(id, seasonId);
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Integer id) {
-		if (!repo.existsById(id)) return ResponseEntity.notFound().build();
-		repo.deleteById(id);
-		return ResponseEntity.noContent().build();
+	@GetMapping("/{id}/games")
+	public List<Game> getTeamGames(@PathVariable Integer id) {
+		return gameService.getTeamGames(id);
 	}
 }
