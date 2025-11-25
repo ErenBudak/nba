@@ -38,9 +38,14 @@ public class PlayerController {
 		return ResponseEntity.ok(stats);
 	}
 
+	@Autowired
+	private com.nba.nba.mapper.StatsMapper statsMapper;
+
 	@GetMapping("/{id}/gamelog")
-	public List<Stats> getGameLog(@PathVariable Integer id, @RequestParam Integer seasonId) {
-		return playerService.getGameLog(id, seasonId);
+	public List<com.nba.nba.dto.StatsDTO> getGameLog(@PathVariable Integer id, @RequestParam Integer seasonId) {
+		return playerService.getGameLog(id, seasonId).stream()
+				.map(statsMapper::toDTO)
+				.collect(java.util.stream.Collectors.toList());
 	}
 
 	@Autowired

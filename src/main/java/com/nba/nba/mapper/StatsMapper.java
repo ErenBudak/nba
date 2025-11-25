@@ -23,6 +23,15 @@ public class StatsMapper {
 
     if (stats.getGame() != null) {
       dto.setGameId(stats.getGame().getId());
+      dto.setGameDate(stats.getGame().getDate().toString());
+      if (stats.getGame().getHomeTeam() != null) {
+        dto.setHomeTeamId(stats.getGame().getHomeTeam().getId());
+        dto.setHomeTeamAbbreviation(stats.getGame().getHomeTeam().getAbbreviation());
+      }
+      if (stats.getGame().getAwayTeam() != null) {
+        dto.setAwayTeamId(stats.getGame().getAwayTeam().getId());
+        dto.setAwayTeamAbbreviation(stats.getGame().getAwayTeam().getAbbreviation());
+      }
     }
     if (stats.getTeam() != null) {
       dto.setTeamId(stats.getTeam().getId());

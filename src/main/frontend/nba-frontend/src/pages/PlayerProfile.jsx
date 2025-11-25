@@ -49,7 +49,7 @@ const PlayerProfile = () => {
             try {
                 try {
                     const statsRes = await getPlayerStats(id, selectedSeason);
-                    setStats(statsRes.data);
+                    setStats(statsRes);
                 } catch (e) {
                     console.warn("Stats not found for season", selectedSeason);
                     setStats(null);
@@ -57,7 +57,7 @@ const PlayerProfile = () => {
 
                 try {
                     const logRes = await getGameLog(id, selectedSeason);
-                    setGameLog(logRes.data);
+                    setGameLog(logRes);
                 } catch (e) {
                     console.warn("Game log not found for season", selectedSeason);
                     setGameLog([]);
@@ -142,13 +142,13 @@ const PlayerProfile = () => {
                         <tbody className="bg-white divide-y divide-slate-200">
                             {gameLog.map((game) => (
                                 <tr key={game.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-4 py-3 whitespace-nowrap text-slate-600">{game.game.date}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-slate-600">{game.gameDate}</td>
                                     <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-900">
-                                        vs {game.game.homeTeam.id === game.team.id ? game.game.awayTeam.abbreviation : game.game.homeTeam.abbreviation}
+                                        vs {game.homeTeamId === game.teamId ? game.awayTeamAbbreviation : game.homeTeamAbbreviation}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.minutes}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center font-bold text-slate-900">{game.points}</td>
-                                    <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.totalRebounds}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.rebounds}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.assists}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.steals}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center text-slate-600">{game.blocks}</td>

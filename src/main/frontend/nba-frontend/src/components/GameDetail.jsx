@@ -20,11 +20,11 @@ const GameDetail = () => {
         const statsData = statsRes.data;
 
         setGame(gameData);
-        const homeTeamId = gameData.homeTeam?.id;
-        const awayTeamId = gameData.awayTeam?.id;
+        const homeTeamId = gameData.homeTeamId;
+        const awayTeamId = gameData.awayTeamId;
 
-        setHomeTeamStats(statsData.filter(s => s.team?.id === homeTeamId));
-        setAwayTeamStats(statsData.filter(s => s.team?.id === awayTeamId));
+        setHomeTeamStats(statsData.filter(s => s.teamId === homeTeamId));
+        setAwayTeamStats(statsData.filter(s => s.teamId === awayTeamId));
 
         setLoading(false);
       })
@@ -42,10 +42,10 @@ const GameDetail = () => {
     <div className="container">
       <Link to="/games">← Geri Dön</Link>
       <h2>
-        {game?.homeTeam?.name} {game?.homeScore} - {game?.awayScore} {game?.awayTeam?.name}
+        {game?.homeTeamName} {game?.homeScore} - {game?.awayScore} {game?.awayTeamName}
       </h2>
 
-      <h3>{game?.homeTeam?.name}</h3>
+      <h3>{game?.homeTeamName}</h3>
       <table className="stats-table">
         <thead>
           <tr>
@@ -58,7 +58,7 @@ const GameDetail = () => {
         <tbody>
           {homeTeamStats.map((stat, idx) => (
             <tr key={idx}>
-              <td>{stat.player_name}</td>
+              <td>{stat.playerName}</td>
               <td>{stat.points}</td>
               <td>{stat.rebounds}</td>
               <td>{stat.assists}</td>
@@ -67,7 +67,7 @@ const GameDetail = () => {
         </tbody>
       </table>
 
-      <h3>{game?.away_team}</h3>
+      <h3>{game?.awayTeamName}</h3>
       <table className="stats-table">
         <thead>
           <tr>
@@ -80,7 +80,7 @@ const GameDetail = () => {
         <tbody>
           {awayTeamStats.map((stat, idx) => (
             <tr key={idx}>
-              <td>{stat.player_name}</td>
+              <td>{stat.playerName}</td>
               <td>{stat.points}</td>
               <td>{stat.rebounds}</td>
               <td>{stat.assists}</td>
