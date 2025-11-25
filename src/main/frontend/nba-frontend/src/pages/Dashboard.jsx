@@ -56,9 +56,13 @@ const Dashboard = () => {
       headerName: 'Pct',
       type: 'number',
       width: 90,
-      valueFormatter: (params) => {
-        const val = params.value;
+      valueFormatter: (value, row) => {
+        const val = (value && typeof value === 'object' && value.value !== undefined)
+          ? value.value
+          : value;
+
         if (typeof val !== 'number' || isNaN(val)) return '0.0%';
+
         return `${(val * 100).toFixed(1)}%`;
       }
     },
@@ -71,14 +75,11 @@ const Dashboard = () => {
     const wins = typeof team.wins === 'number' ? team.wins : Number(team.wins) || 0;
     const losses = typeof team.losses === 'number' ? team.losses : Number(team.losses) || 0;
 
-    // Use backend winPercentage if available, otherwise calculate
+    // Calculate win percentage directly from wins and losses for consistency
     let winPct = 0;
-    if (typeof team.winPercentage === 'number') {
-      winPct = team.winPercentage;
-    } else if (wins + losses > 0) {
+    if (wins + losses > 0) {
       winPct = wins / (wins + losses);
     }
-
     return {
       id: team.teamId || team.id || index,
       teamName,
@@ -125,18 +126,18 @@ const Dashboard = () => {
 
                 return (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={game.id}>
-                    <Card variant="outlined">
+                    <Card elevation={3} sx={{ borderRadius: 2, border: '1px solid #e0e0e0', transition: '0.3s', '&:hover': { boxShadow: 6 } }}>
                       <CardContent>
-                        <Typography variant="subtitle1" component="div" align="center">
+                        <Typography variant="caption" display="block" align="center" color="text.secondary" gutterBottom>
                           {fmtDate}
                         </Typography>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                          <Typography variant="h6">{homeTeamStr}</Typography>
-                          <Typography variant="h6">{homeScore}</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{homeTeamStr}</Typography>
+                          <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold' }}>{homeScore}</Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="h6" color="text.secondary">{awayTeamStr}</Typography>
-                          <Typography variant="h6" color="text.secondary">{awayScore}</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>{awayTeamStr}</Typography>
+                          <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 'bold' }}>{awayScore}</Typography>
                         </Box>
                       </CardContent>
                     </Card>

@@ -119,24 +119,24 @@ const Games = () => {
             games.map((game) => (
               <Grid item xs={12} md={6} lg={4} key={game.id}>
                 <Card
-                  variant="outlined"
-                  sx={{ '&:hover': { boxShadow: 3 }, cursor: 'pointer', textDecoration: 'none' }}
+                  elevation={3}
+                  sx={{ borderRadius: 2, border: '1px solid #e0e0e0', transition: '0.3s', '&:hover': { boxShadow: 6 }, cursor: 'pointer', textDecoration: 'none' }}
                   component={Link}
                   to={`/games/${game.id}`}
                 >
                   <CardContent>
-                    <Typography variant="caption" display="block" color="text.secondary" gutterBottom>
+                    <Typography variant="caption" display="block" align="center" color="text.secondary" gutterBottom>
                       {game.date}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                       <Box sx={{ textAlign: 'center', flex: 1 }}>
-                        <Typography variant="h6">{game.homeTeamName}</Typography>
-                        <Typography variant="h4" fontWeight="bold">{game.homeScore ?? '-'}</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{game.homeTeamName}</Typography>
+                        <Typography variant="h4" color="primary" sx={{ fontWeight: 'bold' }}>{game.homeScore ?? '-'}</Typography>
                       </Box>
                       <Typography variant="h6" color="text.secondary" sx={{ mx: 2 }}>VS</Typography>
                       <Box sx={{ textAlign: 'center', flex: 1 }}>
-                        <Typography variant="h6">{game.awayTeamName}</Typography>
-                        <Typography variant="h4" fontWeight="bold">{game.awayScore ?? '-'}</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>{game.awayTeamName}</Typography>
+                        <Typography variant="h4" color="text.secondary" sx={{ fontWeight: 'bold' }}>{game.awayScore ?? '-'}</Typography>
                       </Box>
                     </Box>
                   </CardContent>

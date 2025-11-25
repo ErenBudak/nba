@@ -1,34 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Container, Grid, Paper, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert, TextField,
-  Dialog, DialogTitle, DialogContent, DialogActions
+import {
+  Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert, TextField
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { getAllPlayers, createPlayer } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { getAllPlayers } from '../services/api';
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const { user } = useAuth();
-  const [openAdd, setOpenAdd] = useState(false);
-  const [newPlayer, setNewPlayer] = useState({ playerName: '', playerSurname: '', height: '', weight: '', nationality: '' });
 
-  const handleAddPlayer = async () => {
-    try {
-        await createPlayer(newPlayer);
-        setOpenAdd(false);
-        setNewPlayer({ playerName: '', playerSurname: '', height: '', weight: '', nationality: '' });
-        const data = await getAllPlayers();
-        setPlayers(data);
-    } catch (e) {
-        console.error(e);
-        alert('Failed to add player');
-    }
-  };
-
+  // Verileri çekme (Fetch) işlemi
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
@@ -45,6 +28,7 @@ const Players = () => {
     fetchPlayers();
   }, []);
 
+  // Arama filtresi
   const filteredPlayers = players.filter(player =>
     player.playerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (player.playerSurname && player.playerSurname.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -80,30 +64,9 @@ const Players = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ width: 300 }}
         />
-        {user?.role === 'ADMIN' && (
-            <Button variant="contained" onClick={() => setOpenAdd(true)} sx={{ ml: 2 }}>
-                Add Player
-            </Button>
-        )}
       </Box>
 
-      <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
-        <DialogTitle>Add New Player</DialogTitle>
-        <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                <TextField label="Name" value={newPlayer.playerName} onChange={(e) => setNewPlayer({...newPlayer, playerName: e.target.value})} fullWidth />
-                <TextField label="Surname" value={newPlayer.playerSurname} onChange={(e) => setNewPlayer({...newPlayer, playerSurname: e.target.value})} fullWidth />
-                <TextField label="Height (cm)" type="number" value={newPlayer.height} onChange={(e) => setNewPlayer({...newPlayer, height: e.target.value})} fullWidth />
-                <TextField label="Weight (kg)" type="number" value={newPlayer.weight} onChange={(e) => setNewPlayer({...newPlayer, weight: e.target.value})} fullWidth />
-                <TextField label="Nationality" value={newPlayer.nationality} onChange={(e) => setNewPlayer({...newPlayer, nationality: e.target.value})} fullWidth />
-            </Box>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setOpenAdd(false)}>Cancel</Button>
-            <Button onClick={handleAddPlayer} variant="contained">Add</Button>
-        </DialogActions>
-      </Dialog>
-
+      {/* Grid ve Kartlar (Liste) */}
       <Grid container spacing={3}>
         {filteredPlayers.map((player) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={player.id}>
