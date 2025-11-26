@@ -5,10 +5,16 @@ import {
 } from '@mui/material';
 import {
   createTeam, createPlayer, createRoster, createStats,
-  getAllDivisions, getAllTeams, getAllPlayers, getAllSeasons
+  getAllDivisions, getAllTeams, getAllPlayers, getAllSeasons, getAllGames
 } from '../services/api';
 import AddGameForm from '../components/AddGameForm';
 import AddStatsForm from '../components/AddStatsForm';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import {
+  List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Divider
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteTeam, deletePlayer, deleteGame } from '../services/api';
 
 const AdminPage = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -38,6 +44,9 @@ const AdminPage = () => {
           <Tab label="Manage Roster" />
           <Tab label="Add Game" />
           <Tab label="Add Stats" />
+          <Tab label="Manage Teams" />
+          <Tab label="Manage Players" />
+          <Tab label="Manage Games" />
         </Tabs>
       </Paper>
 
@@ -55,6 +64,15 @@ const AdminPage = () => {
       </Box>
       <Box hidden={tabValue !== 4}>
         {tabValue === 4 && <AddStatsForm onSuccess={() => showNotification('Stats added successfully!')} />}
+      </Box>
+      <Box hidden={tabValue !== 5}>
+        {tabValue === 5 && <ManageTeams onSuccess={showNotification} />}
+      </Box>
+      <Box hidden={tabValue !== 6}>
+        {tabValue === 6 && <ManagePlayers onSuccess={showNotification} />}
+      </Box>
+      <Box hidden={tabValue !== 7}>
+        {tabValue === 7 && <ManageGames onSuccess={showNotification} />}
       </Box>
 
       <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleCloseNotification}>
@@ -249,3 +267,215 @@ const CreateRosterForm = ({ onSuccess }) => {
 
 
 export default AdminPage;
+
+const ManageTeams = ({ onSuccess }) => {
+  const [teams, setTeams] = useState([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    loadTeams();
+  }, []);
+
+  const loadTeams = () => {
+    getAllTeams().then(setTeams).catch(console.error);
+  };
+
+  const handleDeleteClick = (team) => {
+    setSelectedItem(team);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      await deleteTeam(selectedItem.id);
+      setTeams(teams.filter(t => t.id !== selectedItem.id));
+      onSuccess('Team deleted successfully!');
+    } catch (error) {
+      onSuccess('Failed to delete team: ' + error.message, 'error');
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedItem(null);
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 3 }}>
+      <Typography variant="h6" gutterBottom>Manage Teams</Typography>
+      <List>
+        {teams.map((team) => (
+          <React.Fragment key={team.id}>
+            <ListItem>
+              <ListItemText primary={team.name} secondary={`${team.city} - ${team.abbreviation}`} />
+              <ListItemSecondaryAction>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteClick(team)}>
+                  <DeleteIcon color="error" />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+            <Divider />
+          </React.Fragment>
+        ))}
+      </List>
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Team"
+        content={`Are you sure you want to delete ${selectedItem?.name}?`}
+      />
+    </Paper>
+  );
+};
+
+const ManagePlayers = ({ onSuccess }) => {
+  const [players, setPlayers] = useState([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    loadPlayers();
+  }, []);
+
+  const loadPlayers = () => {
+    getAllPlayers().then(setPlayers).catch(console.error);
+  };
+
+  const handleDeleteClick = (player) => {
+    setSelectedItem(player);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      await deletePlayer(selectedItem.id);
+      setPlayers(players.filter(p => p.id !== selectedItem.id));
+      onSuccess('Player deleted successfully!');
+    } catch (error) {
+      onSuccess('Failed to delete player: ' + error.message, 'error');
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedItem(null);
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 3 }}>
+      <Typography variant="h6" gutterBottom>Manage Players</Typography>
+      <List>
+        {players.map((player) => (
+          <React.Fragment key={player.id}>
+            <ListItem>
+              <ListItemText primary={`${player.playerName} ${player.playerSurname}`} secondary={`Height: ${player.height}cm, Weight: ${player.weight}kg`} />
+              <ListItemSecondaryAction>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteClick(player)}>
+                  <DeleteIcon color="error" />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+            <Divider />
+          </React.Fragment>
+        ))}
+      </List>
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Player"
+        content={`Are you sure you want to delete ${selectedItem?.playerName} ${selectedItem?.playerSurname}?`}
+      />
+    </Paper>
+  );
+};
+
+const ManageGames = ({ onSuccess }) => {
+  const [games, setGames] = useState([]);
+  const [seasons, setSeasons] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    getAllSeasons().then(setSeasons).catch(console.error);
+    loadGames();
+  }, []);
+
+  useEffect(() => {
+    loadGames();
+  }, [selectedSeason]);
+
+  const loadGames = () => {
+    getAllGames(selectedSeason || null).then(setGames).catch(console.error);
+  };
+
+  const handleDeleteClick = (game) => {
+    setSelectedItem(game);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      await deleteGame(selectedItem.id);
+      setGames(games.filter(g => g.id !== selectedItem.id));
+      onSuccess('Game deleted successfully!');
+    } catch (error) {
+      onSuccess('Failed to delete game: ' + error.message, 'error');
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedItem(null);
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">Manage Games</Typography>
+        <FormControl sx={{ minWidth: 200 }} size="small">
+          <InputLabel>Filter by Season</InputLabel>
+          <Select
+            value={selectedSeason}
+            label="Filter by Season"
+            onChange={(e) => setSelectedSeason(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>All Seasons</em>
+            </MenuItem>
+            {seasons.map((season) => (
+              <MenuItem key={season.id} value={season.id}>
+                {season.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+      <List>
+        {games.map((game) => (
+          <React.Fragment key={game.id}>
+            <ListItem>
+              <ListItemText
+                primary={`${game.homeTeamName} vs ${game.awayTeamName}`}
+                secondary={`${game.date} - ${game.gameType} (${game.homeScore || 0} - ${game.awayScore || 0})`}
+              />
+              <ListItemSecondaryAction>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteClick(game)}>
+                  <DeleteIcon color="error" />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+            <Divider />
+          </React.Fragment>
+        ))}
+      </List>
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Game"
+        content={`Are you sure you want to delete ${selectedItem?.homeTeamName} vs ${selectedItem?.awayTeamName}?`}
+      />
+    </Paper>
+  );
+};

@@ -29,6 +29,9 @@ public class GameController {
 	@Autowired
 	private StatsMapper statsMapper;
 
+	@Autowired
+	private com.nba.nba.service.AuditLogService auditLogService;
+
 	@GetMapping
 	public List<GameDTO> getAllGames(@RequestParam(required = false) Integer seasonId,
 			@RequestParam(required = false) Integer teamId) {
@@ -77,5 +80,16 @@ public class GameController {
 	public ResponseEntity<GameDTO> createGame(@RequestBody CreateGameDTO dto) {
 		GameDTO createdGame = gameService.createGame(dto);
 		return ResponseEntity.ok(createdGame);
+	}
+
+	@DeleteMapping("/{id}")
+	@RequireRole("ADMIN")
+	public ResponseEntity<?> deleteGame(@PathVariable Integer id, jakarta.servlet.http.HttpServletRequest request) {
+		gameService.deleteGame(id);
+
+		Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+		auditLogService.logAction(userId, "DELETE_GAME", "GAME", id, "Deleted game with ID: " + id);
+
+		return ResponseEntity.ok().build();
 	}
 }

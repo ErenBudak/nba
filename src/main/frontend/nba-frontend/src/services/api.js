@@ -58,11 +58,12 @@ export const getAllGames = (seasonId, teamId) => {
 export const getAllSeasons = () => api.get('/games/seasons').then(res => res.data);
 export const createPlayer = (player) => api.post('/players', player).then(res => res.data);
 export const createTeam = (team) => api.post('/teams', team).then(res => res.data);
-export const deletePlayer = (id) => api.delete(`/players/${id}`);
-export const deleteTeam = (id) => api.delete(`/teams/${id}`);
+export const deletePlayer = (id) => api.delete(`/players/${id}`).then(res => res.data);
+export const deleteTeam = (id) => api.delete(`/teams/${id}`).then(res => res.data);
 export const createRoster = (roster) => api.post('/roster', roster).then(res => res.data);
-export const createStats = (stats) => api.post('/stats', stats).then(res => res.data);
+export const createStats = (statsData) => api.post('/stats', statsData).then(res => res.data);
 export const createGame = (game) => api.post('/games', game).then(res => res.data);
+export const deleteGame = (id) => api.delete(`/games/${id}`).then(res => res.data);
 export const getAllDivisions = () => api.get('/teams/divisions').then(res => res.data);
 
 export default api;

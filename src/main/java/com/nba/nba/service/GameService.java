@@ -148,4 +148,8 @@ public class GameService {
     Game savedGame = gameRepository.save(game);
     return gameMapper.toDTO(savedGame);
   }
+
+  public void deleteGame(Integer id) {
+    gameRepository.deleteById(id);
+  }
 }
