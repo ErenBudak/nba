@@ -1,7 +1,7 @@
 package com.nba.nba.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.nba.nba.config.entity.Stats;
+import com.nba.nba.entity.Stats;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.nba.nba.repository;
 
-import com.nba.nba.config.entity.Conference;
+import com.nba.nba.entity.Conference;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

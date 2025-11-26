@@ -1,11 +1,12 @@
-package com.nba.nba.config.entity;
+package com.nba.nba.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+
+// Standart ekleme, güncelleme, silme işlemleri için audit log tutar.
 
 @Entity
 @Table(name = "AUDIT_LOG")

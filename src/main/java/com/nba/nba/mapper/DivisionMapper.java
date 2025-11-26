@@ -1,6 +1,6 @@
 package com.nba.nba.mapper;
 
-import com.nba.nba.config.entity.Division;
+import com.nba.nba.entity.Division;
 import com.nba.nba.dto.DivisionDTO;
 import org.springframework.stereotype.Component;
 

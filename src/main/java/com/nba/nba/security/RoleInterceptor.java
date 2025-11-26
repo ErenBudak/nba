@@ -1,14 +1,15 @@
 package com.nba.nba.security;
 
-import com.nba.nba.config.entity.AppUser;
+import com.nba.nba.entity.AppUser;
 import com.nba.nba.repository.AppUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-
 import java.util.Optional;
+
+// her isteği kontrol ediyor
 
 @Component
 public class RoleInterceptor implements HandlerInterceptor {
@@ -29,7 +30,7 @@ public class RoleInterceptor implements HandlerInterceptor {
     RequireRole requireRole = handlerMethod.getMethodAnnotation(RequireRole.class);
 
     if (requireRole == null) {
-      return true; // No role required
+      return true;
     }
 
     String userIdStr = request.getHeader("X-User-Id");
@@ -57,14 +58,6 @@ public class RoleInterceptor implements HandlerInterceptor {
 
     AppUser user = userOpt.get();
     String requiredRole = requireRole.value();
-
-    // Simple role check: ADMIN can access everything? Or strict check?
-    // Requirement: "Sadece 'ADMIN' rolüne sahip olanlar veri girişi yapabilsin."
-    // So if required is ADMIN, user must be ADMIN.
-    // If required is USER, ADMIN should probably also be able to access, or just
-    // USER.
-    // Let's assume ADMIN has all privileges, so if user is ADMIN, they pass.
-    // If user is USER, they only pass if requiredRole is USER.
 
     if ("ADMIN".equals(user.getRole())) {
       return true; // Admin passes all checks

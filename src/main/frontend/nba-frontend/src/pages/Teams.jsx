@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert
+  Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert, IconButton
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { getAllTeams } from '../services/api';
+import { getAllTeams, addFavoriteTeam, removeFavoriteTeam, getMyProfile } from '../services/api';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useAuth } from '../context/AuthContext';
 
 const Teams = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState(new Set());
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchTeamsAndFavorites = async () => {
       try {
-        const data = await getAllTeams();
-        setTeams(data);
+        const [teamsData, profileData] = await Promise.all([
+          getAllTeams(),
+          user ? getMyProfile().catch(() => null) : Promise.resolve(null)
+        ]);
+        setTeams(teamsData);
+
+        if (profileData && profileData.favoriteTeams) {
+          const favIds = new Set(profileData.favoriteTeams.map(f => f.teamId));
+          setFavorites(favIds);
+        }
       } catch (err) {
         setError('Failed to load teams');
         console.error(err);
@@ -25,8 +36,32 @@ const Teams = () => {
       }
     };
 
-    fetchTeams();
-  }, []);
+    fetchTeamsAndFavorites();
+  }, [user]);
+
+  const handleToggleFavorite = async (teamId) => {
+    if (!user) return;
+
+    try {
+      if (favorites.has(teamId)) {
+        await removeFavoriteTeam(teamId);
+        setFavorites(prev => {
+          const newFavs = new Set(prev);
+          newFavs.delete(teamId);
+          return newFavs;
+        });
+      } else {
+        await addFavoriteTeam(teamId);
+        setFavorites(prev => {
+          const newFavs = new Set(prev);
+          newFavs.add(teamId);
+          return newFavs;
+        });
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -66,8 +101,13 @@ const Teams = () => {
                   Abbreviation: {team.abbreviation}
                 </Typography>
               </CardContent>
-              <CardActions>
+              <CardActions sx={{ justifyContent: 'space-between' }}>
                 <Button size="small" component={Link} to={`/teams/${team.id}`}>View Details</Button>
+                {user && (
+                  <IconButton onClick={() => handleToggleFavorite(team.id)} color="secondary">
+                    {favorites.has(team.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  </IconButton>
+                )}
               </CardActions>
             </Card>
           </Grid>

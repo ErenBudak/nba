@@ -2,7 +2,8 @@ package com.nba.nba.service;
 
 import com.nba.nba.dto.LoginDTO;
 import com.nba.nba.dto.RegisterDTO;
-import com.nba.nba.config.entity.AppUser;
+import com.nba.nba.dto.UserDTO;
+import com.nba.nba.entity.AppUser;
 import com.nba.nba.repository.AppUserRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class AuthService {
     this.appUserRepository = appUserRepository;
   }
 
-  public AppUser register(RegisterDTO dto) {
+  public UserDTO register(RegisterDTO dto) {
     if (appUserRepository.findByUsername(dto.getUsername()).isPresent()) {
       throw new RuntimeException("Username already exists");
     }
@@ -31,10 +32,11 @@ public class AuthService {
     user.setPassword(dto.getPassword());
     user.setRole("USER");
 
-    return appUserRepository.save(user);
+    AppUser savedUser = appUserRepository.save(user);
+    return mapToDTO(savedUser);
   }
 
-  public AppUser login(LoginDTO dto) {
+  public UserDTO login(LoginDTO dto) {
     Optional<AppUser> userOpt = appUserRepository.findByUsername(dto.getUsername());
     if (userOpt.isEmpty()) {
       throw new RuntimeException("User not found");
@@ -45,6 +47,15 @@ public class AuthService {
       throw new RuntimeException("Invalid password");
     }
 
-    return user;
+    return mapToDTO(user);
+  }
+
+  private UserDTO mapToDTO(AppUser user) {
+    UserDTO dto = new UserDTO();
+    dto.setId(user.getId());
+    dto.setUsername(user.getUsername());
+    dto.setEmail(user.getEmail());
+    dto.setRole(user.getRole());
+    return dto;
   }
 }

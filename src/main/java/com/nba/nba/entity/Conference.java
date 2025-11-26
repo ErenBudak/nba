@@ -1,18 +1,18 @@
-package com.nba.nba.config.entity;
+package com.nba.nba.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "SEASON")
+@Table(name = "CONFERENCE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Season {
+public class Conference {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(name = "name", nullable = false, length = 10, unique = true)
-	private String name;
+	@Column(name = "conference_name", length = 4)
+	private String conferenceName;
 }

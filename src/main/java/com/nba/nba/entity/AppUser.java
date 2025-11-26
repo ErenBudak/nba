@@ -1,4 +1,4 @@
-package com.nba.nba.config.entity;
+package com.nba.nba.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class AppUser {
   private String password;
 
   @Column(nullable = false, length = 20)
-  private String role; // 'ADMIN' or 'USER'
+  private String role;
 
   @Column(name = "created_at", insertable = false, updatable = false)
   private LocalDateTime createdAt;

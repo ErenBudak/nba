@@ -1,4 +1,4 @@
-package com.nba.nba.config.entity;
+package com.nba.nba.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

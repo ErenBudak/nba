@@ -1,6 +1,6 @@
 package com.nba.nba.mapper;
 
-import com.nba.nba.config.entity.Season;
+import com.nba.nba.entity.Season;
 import com.nba.nba.dto.SeasonDTO;
 import org.springframework.stereotype.Component;
 

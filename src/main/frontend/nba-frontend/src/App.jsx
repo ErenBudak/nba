@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { AuthProvider } from './context/AuthContext';
 
@@ -15,6 +15,7 @@ import TeamPage from './pages/TeamPage'; // veya TeamDetail
 import Games from './pages/Games';
 import GameDetail from './pages/GameDetail';
 import AdminPage from './pages/AdminPage';
+import ProfilePage from './pages/ProfilePage';
 // ------------------------------------------------------------------------
 
 // Tema ayarları burada düzgün bir değişkene atandı
@@ -68,6 +69,12 @@ function App() {
 
             {/* Admin Route */}
             <Route path="/admin" element={<AdminPage />} />
+
+            {/* User Profile */}
+            <Route path="/profile" element={<ProfilePage />} />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </AuthProvider>

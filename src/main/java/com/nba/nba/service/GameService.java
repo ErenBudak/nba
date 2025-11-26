@@ -1,14 +1,19 @@
 package com.nba.nba.service;
 
 import com.nba.nba.dto.StandingsDTO;
-import com.nba.nba.config.entity.Game;
-import com.nba.nba.config.entity.Team;
+import com.nba.nba.entity.Game;
+import com.nba.nba.entity.Team;
 import com.nba.nba.repository.GameRepository;
 import com.nba.nba.repository.TeamRepository;
 import com.nba.nba.repository.SeasonRepository;
-import com.nba.nba.repository.StatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.nba.nba.mapper.GameMapper;
+import com.nba.nba.mapper.SeasonMapper;
+import com.nba.nba.dto.GameDTO;
+import com.nba.nba.dto.SeasonDTO;
+import com.nba.nba.dto.CreateGameDTO;
+import com.nba.nba.entity.Season;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,18 +31,12 @@ public class GameService {
   private SeasonRepository seasonRepository;
 
   @Autowired
-  private StatsRepository statsRepository;
+  private GameMapper gameMapper;
 
   @Autowired
-  private com.nba.nba.mapper.GameMapper gameMapper;
+  private SeasonMapper seasonMapper;
 
-  @Autowired
-  private com.nba.nba.mapper.SeasonMapper seasonMapper;
-
-  @Autowired
-  private com.nba.nba.mapper.StatsMapper statsMapper;
-
-  public List<com.nba.nba.dto.GameDTO> getRecentGames() {
+  public List<GameDTO> getRecentGames() {
     return gameRepository.findTop10ByOrderByDateDesc().stream()
         .map(gameMapper::toDTO)
         .collect(Collectors.toList());
@@ -92,11 +91,11 @@ public class GameService {
         .collect(Collectors.toList());
   }
 
-  public Optional<com.nba.nba.dto.GameDTO> getGameById(Integer id) {
+  public Optional<GameDTO> getGameById(Integer id) {
     return gameRepository.findById(id).map(gameMapper::toDTO);
   }
 
-  public List<com.nba.nba.dto.GameDTO> getTeamGames(Integer teamId) {
+  public List<GameDTO> getTeamGames(Integer teamId) {
     return gameRepository.findAll().stream()
         .filter(g -> g.getHomeTeam().getId().equals(teamId) || g.getAwayTeam().getId().equals(teamId))
         .sorted(Comparator.comparing(Game::getDate))
@@ -104,7 +103,7 @@ public class GameService {
         .collect(Collectors.toList());
   }
 
-  public List<com.nba.nba.dto.GameDTO> getAllGames(Integer seasonId, Integer teamId) {
+  public List<GameDTO> getAllGames(Integer seasonId, Integer teamId) {
     List<Game> games;
     if (seasonId != null && teamId != null) {
       games = gameRepository.findBySeasonIdAndHomeTeamIdOrSeasonIdAndAwayTeamId(seasonId, teamId, seasonId, teamId);
@@ -122,9 +121,29 @@ public class GameService {
         .collect(Collectors.toList());
   }
 
-  public List<com.nba.nba.dto.SeasonDTO> getAllSeasons() {
+  public List<SeasonDTO> getAllSeasons() {
     return seasonRepository.findAll().stream()
         .map(seasonMapper::toDTO)
         .collect(Collectors.toList());
+  }
+
+  public GameDTO createGame(CreateGameDTO dto) {
+    Game game = new Game();
+    game.setDate(dto.getDate());
+    game.setGameType(dto.getGameType());
+
+    Team homeTeam = teamRepository.findById(dto.getHomeTeamId())
+        .orElseThrow(() -> new RuntimeException("Home team not found"));
+    Team awayTeam = teamRepository.findById(dto.getAwayTeamId())
+        .orElseThrow(() -> new RuntimeException("Away team not found"));
+    Season season = seasonRepository.findById(dto.getSeasonId())
+        .orElseThrow(() -> new RuntimeException("Season not found"));
+
+    game.setHomeTeam(homeTeam);
+    game.setAwayTeam(awayTeam);
+    game.setSeason(season);
+
+    Game savedGame = gameRepository.save(game);
+    return gameMapper.toDTO(savedGame);
   }
 }

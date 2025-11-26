@@ -1,38 +1,75 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert, TextField
+  Container, Grid, Typography, Box, Card, CardContent, CardActions, Button, CircularProgress, Alert, TextField, IconButton
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { getAllPlayers } from '../services/api';
+import { getAllPlayers, addFavoritePlayer, removeFavoritePlayer, getMyProfile } from '../services/api';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useAuth } from '../context/AuthContext';
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [favorites, setFavorites] = useState(new Set());
+  const { user } = useAuth();
 
   // Verileri çekme (Fetch) işlemi
   useEffect(() => {
-    const fetchPlayers = async () => {
+    const fetchPlayersAndFavorites = async () => {
       try {
-        const data = await getAllPlayers();
-        setPlayers(data);
+        const [playersData, profileData] = await Promise.all([
+          getAllPlayers(),
+          user ? getMyProfile().catch(() => null) : Promise.resolve(null)
+        ]);
+        setPlayers(playersData);
+
+        if (profileData && profileData.favoritePlayers) {
+          const favIds = new Set(profileData.favoritePlayers.map(f => f.playerId));
+          setFavorites(favIds);
+        }
       } catch (err) {
-        setError('Failed to load players');
+        setError('Failed to load data');
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlayers();
-  }, []);
+    fetchPlayersAndFavorites();
+  }, [user]);
 
   // Arama filtresi
   const filteredPlayers = players.filter(player =>
     player.playerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (player.playerSurname && player.playerSurname.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleToggleFavorite = async (playerId) => {
+    if (!user) return; // Or redirect to login
+
+    try {
+      if (favorites.has(playerId)) {
+        await removeFavoritePlayer(playerId);
+        setFavorites(prev => {
+          const newFavs = new Set(prev);
+          newFavs.delete(playerId);
+          return newFavs;
+        });
+      } else {
+        await addFavoritePlayer(playerId);
+        setFavorites(prev => {
+          const newFavs = new Set(prev);
+          newFavs.add(playerId);
+          return newFavs;
+        });
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -85,8 +122,13 @@ const Players = () => {
                   Nationality: {player.nationality}
                 </Typography>
               </CardContent>
-              <CardActions>
+              <CardActions sx={{ justifyContent: 'space-between' }}>
                 <Button size="small" component={Link} to={`/players/${player.id}`}>View Profile</Button>
+                {user && (
+                  <IconButton onClick={() => handleToggleFavorite(player.id)} color="secondary">
+                    {favorites.has(player.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  </IconButton>
+                )}
               </CardActions>
             </Card>
           </Grid>

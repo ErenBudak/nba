@@ -1,14 +1,18 @@
 package com.nba.nba.controller;
 
 import com.nba.nba.dto.PlayerStatsDTO;
-import com.nba.nba.config.entity.Player;
-import com.nba.nba.config.entity.Stats;
+import com.nba.nba.entity.Player;
 import com.nba.nba.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import com.nba.nba.mapper.StatsMapper;
+import com.nba.nba.dto.StatsDTO;
+import com.nba.nba.service.AuditLogService;
+import com.nba.nba.security.RequireRole;
+
+// oyuncular ile ilgili işlemler için controller
 
 @RestController
 @RequestMapping("/api/players")
@@ -39,20 +43,20 @@ public class PlayerController {
 	}
 
 	@Autowired
-	private com.nba.nba.mapper.StatsMapper statsMapper;
+	private StatsMapper statsMapper;
 
 	@GetMapping("/{id}/gamelog")
-	public List<com.nba.nba.dto.StatsDTO> getGameLog(@PathVariable Integer id, @RequestParam Integer seasonId) {
+	public List<StatsDTO> getGameLog(@PathVariable Integer id, @RequestParam Integer seasonId) {
 		return playerService.getGameLog(id, seasonId).stream()
 				.map(statsMapper::toDTO)
 				.collect(java.util.stream.Collectors.toList());
 	}
 
 	@Autowired
-	private com.nba.nba.service.AuditLogService auditLogService;
+	private AuditLogService auditLogService;
 
 	@PostMapping
-	@com.nba.nba.security.RequireRole("ADMIN")
+	@RequireRole("ADMIN")
 	public ResponseEntity<Player> createPlayer(@RequestBody Player player,
 			jakarta.servlet.http.HttpServletRequest request) {
 		Player savedPlayer = playerService.savePlayer(player);
@@ -65,7 +69,7 @@ public class PlayerController {
 	}
 
 	@DeleteMapping("/{id}")
-	@com.nba.nba.security.RequireRole("ADMIN")
+	@RequireRole("ADMIN")
 	public ResponseEntity<?> deletePlayer(@PathVariable Integer id, jakarta.servlet.http.HttpServletRequest request) {
 		playerService.deletePlayer(id);
 

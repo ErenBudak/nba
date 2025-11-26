@@ -10,7 +10,7 @@ const TeamPage = () => {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [seasons, setSeasons] = useState([]);
-    const [selectedSeason, setSelectedSeason] = useState([]);
+    const [selectedSeason, setSelectedSeason] = useState(null);
 
     useEffect(() => {
         const fetchSeasons = async () => {
@@ -44,7 +44,7 @@ const TeamPage = () => {
     }, [id]);
 
     useEffect(() => {
-        if (!selectedSeason) return;
+        // if (!selectedSeason) return; // Allow fetching if season is null (backend handles it)
 
         const fetchTeamData = async () => {
             try {

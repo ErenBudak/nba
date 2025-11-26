@@ -62,6 +62,9 @@ const Navbar = () => {
                 <Typography variant="body2" sx={{ color: 'white' }}>
                   Welcome, {user.username} ({user.role})
                 </Typography>
+                <Button component={RouterLink} to="/profile" color="inherit" variant="text">
+                  Profile
+                </Button>
                 <Button onClick={handleLogout} color="inherit" variant="outlined" size="small">
                   Logout
                 </Button>

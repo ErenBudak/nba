@@ -1,18 +1,28 @@
 package com.nba.nba.service;
 
 import com.nba.nba.dto.PlayerStatsDTO;
-import com.nba.nba.config.entity.Stats;
+import com.nba.nba.entity.Stats;
 import com.nba.nba.repository.StatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import com.nba.nba.repository.PlayerRepository;
+import com.nba.nba.repository.GameRepository;
+import com.nba.nba.repository.TeamRepository;
+import com.nba.nba.dto.CreateStatsDTO;
+import com.nba.nba.entity.Player;
+import com.nba.nba.entity.Game;
+import com.nba.nba.entity.Team;
 
 @Service
 public class StatsService {
 
   @Autowired
   private StatsRepository statsRepository;
+
+  @Autowired
+  private com.nba.nba.repository.RosterRepository rosterRepository;
 
   public PlayerStatsDTO calculateSeasonStats(Integer playerId, Integer seasonId) {
     List<Stats> statsList = statsRepository.findByPlayerIdAndSeasonId(playerId, seasonId);
@@ -74,19 +84,33 @@ public class StatsService {
   }
 
   @Autowired
-  private com.nba.nba.repository.PlayerRepository playerRepository;
+  private PlayerRepository playerRepository;
   @Autowired
-  private com.nba.nba.repository.GameRepository gameRepository;
+  private GameRepository gameRepository;
   @Autowired
-  private com.nba.nba.repository.TeamRepository teamRepository;
+  private TeamRepository teamRepository;
 
-  public Stats createStats(com.nba.nba.dto.CreateStatsDTO dto) {
-    com.nba.nba.config.entity.Player player = playerRepository.findById(dto.getPlayerId())
+  public Stats createStats(CreateStatsDTO dto) {
+    Player player = playerRepository.findById(dto.getPlayerId())
         .orElseThrow(() -> new RuntimeException("Player not found"));
-    com.nba.nba.config.entity.Game game = gameRepository.findById(dto.getGameId())
+    Game game = gameRepository.findById(dto.getGameId())
         .orElseThrow(() -> new RuntimeException("Game not found"));
-    com.nba.nba.config.entity.Team team = teamRepository.findById(dto.getTeamId())
+    Team team = teamRepository.findById(dto.getTeamId())
         .orElseThrow(() -> new RuntimeException("Team not found"));
+
+    // Validate that the team is either home or away team
+    if (!team.getId().equals(game.getHomeTeam().getId()) && !team.getId().equals(game.getAwayTeam().getId())) {
+      throw new RuntimeException("Selected team is not part of this game");
+    }
+
+    // Validate that the player is in the roster of the selected team for the game's
+    // season
+    boolean isPlayerInRoster = rosterRepository.existsByPlayerIdAndTeamIdAndSeasonId(
+        player.getId(), team.getId(), game.getSeason().getId());
+
+    if (!isPlayerInRoster) {
+      throw new RuntimeException("Selected player is not in the roster of either team for this game's season.");
+    }
 
     Stats stats = new Stats();
     stats.setPlayer(player);

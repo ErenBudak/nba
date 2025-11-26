@@ -1,6 +1,6 @@
 package com.nba.nba.service;
 
-import com.nba.nba.config.entity.AuditLog;
+import com.nba.nba.entity.AuditLog;
 import com.nba.nba.repository.AuditLogRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,10 +2,12 @@ package com.nba.nba.controller;
 
 import com.nba.nba.dto.LoginDTO;
 import com.nba.nba.dto.RegisterDTO;
-import com.nba.nba.config.entity.AppUser;
+import com.nba.nba.dto.UserDTO;
 import com.nba.nba.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+// kullanıcı kayıt ve giriş işlemleri için controller
 
 @RestController
 @RequestMapping("/auth")
@@ -20,7 +22,7 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<?> register(@RequestBody RegisterDTO dto) {
     try {
-      AppUser user = authService.register(dto);
+      UserDTO user = authService.register(dto);
       return ResponseEntity.ok(user);
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -30,7 +32,7 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody LoginDTO dto) {
     try {
-      AppUser user = authService.login(dto);
+      UserDTO user = authService.login(dto);
       return ResponseEntity.ok(user);
     } catch (RuntimeException e) {
       return ResponseEntity.status(401).body(e.getMessage());

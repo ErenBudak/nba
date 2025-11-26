@@ -3,11 +3,6 @@ package com.nba.nba.dto;
 import lombok.Data;
 
 @Data
-package com.nba.nba.dto;
-
-import lombok.Data;
-
-@Data
 public class StatsDTO {
   private Integer id;
   private Integer gameId;

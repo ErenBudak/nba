@@ -1,8 +1,8 @@
 package com.nba.nba.controller;
 
-import com.nba.nba.config.entity.AppUser;
-import com.nba.nba.config.entity.UserFavoritePlayer;
-import com.nba.nba.config.entity.UserFavoriteTeam;
+import com.nba.nba.entity.AppUser;
+import com.nba.nba.entity.UserFavoritePlayer;
+import com.nba.nba.entity.UserFavoriteTeam;
 import com.nba.nba.repository.AppUserRepository;
 import com.nba.nba.repository.UserFavoritePlayerRepository;
 import com.nba.nba.repository.UserFavoriteTeamRepository;
@@ -13,12 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.Optional;
 
+// kullanıcı ile ilgili işlemler için controller
+
 @RestController
-@RequestMapping("/my-profile")
+@RequestMapping("/api/my-profile")
 public class UserController {
 
   private final AppUserRepository appUserRepository;

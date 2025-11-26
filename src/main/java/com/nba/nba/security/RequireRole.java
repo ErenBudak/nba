@@ -5,8 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+// Metot seviyesinde rol kontrolü için custom annotation
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequireRole {
-  String value(); // e.g., "ADMIN" or "USER"
+  String value(); // Admin or User
 }

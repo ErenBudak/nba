@@ -5,8 +5,10 @@ import {
 } from '@mui/material';
 import {
   createTeam, createPlayer, createRoster, createStats,
-  getAllDivisions, getAllTeams, getAllPlayers, getAllSeasons, getRecentGames
+  getAllDivisions, getAllTeams, getAllPlayers, getAllSeasons
 } from '../services/api';
+import AddGameForm from '../components/AddGameForm';
+import AddStatsForm from '../components/AddStatsForm';
 
 const AdminPage = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -34,6 +36,7 @@ const AdminPage = () => {
           <Tab label="Create Team" />
           <Tab label="Create Player" />
           <Tab label="Manage Roster" />
+          <Tab label="Add Game" />
           <Tab label="Add Stats" />
         </Tabs>
       </Paper>
@@ -48,7 +51,10 @@ const AdminPage = () => {
         {tabValue === 2 && <CreateRosterForm onSuccess={showNotification} />}
       </Box>
       <Box hidden={tabValue !== 3}>
-        {tabValue === 3 && <CreateStatsForm onSuccess={showNotification} />}
+        {tabValue === 3 && <AddGameForm onSuccess={() => showNotification('Game created successfully!')} />}
+      </Box>
+      <Box hidden={tabValue !== 4}>
+        {tabValue === 4 && <AddStatsForm onSuccess={() => showNotification('Stats added successfully!')} />}
       </Box>
 
       <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleCloseNotification}>
@@ -240,80 +246,6 @@ const CreateRosterForm = ({ onSuccess }) => {
   );
 };
 
-const CreateStatsForm = ({ onSuccess }) => {
-  const [formData, setFormData] = useState({
-    gameId: '', teamId: '', playerId: '', minutesPlayed: '', points: '', rebounds: '', assists: '',
-    steals: '', blocks: '', turnovers: '', fieldGoalsMade: '', fieldGoalsAttempted: '',
-    threePointersMade: '', threePointersAttempted: '', freeThrowsMade: '', freeThrowsAttempted: '', personalFouls: ''
-  });
-  const [games, setGames] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [players, setPlayers] = useState([]);
 
-  useEffect(() => {
-    getRecentGames().then(setGames).catch(console.error); // Ideally getAllGames with pagination/search
-    getAllTeams().then(setTeams).catch(console.error);
-    getAllPlayers().then(setPlayers).catch(console.error);
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createStats(formData);
-      onSuccess('Stats added successfully!');
-      // Reset stats but keep game/team
-      setFormData({ ...formData, playerId: '', minutesPlayed: '', points: '', rebounds: '', assists: '', steals: '', blocks: '', turnovers: '' });
-    } catch (error) {
-      onSuccess('Failed to add stats: ' + error.message, 'error');
-    }
-  };
-
-  return (
-    <Paper sx={{ p: 3 }}>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth required>
-              <InputLabel>Game</InputLabel>
-              <Select value={formData.gameId} label="Game" onChange={(e) => setFormData({ ...formData, gameId: e.target.value })}>
-                {games.map(g => <MenuItem key={g.id} value={g.id}>{g.homeTeamName} vs {g.awayTeamName} ({g.date})</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth required>
-              <InputLabel>Team</InputLabel>
-              <Select value={formData.teamId} label="Team" onChange={(e) => setFormData({ ...formData, teamId: e.target.value })}>
-                {teams.map(t => <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth required>
-              <InputLabel>Player</InputLabel>
-              <Select value={formData.playerId} label="Player" onChange={(e) => setFormData({ ...formData, playerId: e.target.value })}>
-                {players.map(p => <MenuItem key={p.id} value={p.id}>{p.playerName} {p.playerSurname}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {/* Stats Inputs */}
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Minutes" value={formData.minutesPlayed} onChange={(e) => setFormData({ ...formData, minutesPlayed: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Points" value={formData.points} onChange={(e) => setFormData({ ...formData, points: e.target.value })} required /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Rebounds" value={formData.rebounds} onChange={(e) => setFormData({ ...formData, rebounds: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Assists" value={formData.assists} onChange={(e) => setFormData({ ...formData, assists: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Steals" value={formData.steals} onChange={(e) => setFormData({ ...formData, steals: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Blocks" value={formData.blocks} onChange={(e) => setFormData({ ...formData, blocks: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Turnovers" value={formData.turnovers} onChange={(e) => setFormData({ ...formData, turnovers: e.target.value })} /></Grid>
-          <Grid item xs={6} sm={3}><TextField fullWidth type="number" label="Fouls" value={formData.personalFouls} onChange={(e) => setFormData({ ...formData, personalFouls: e.target.value })} /></Grid>
-
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>Add Stats</Button>
-          </Grid>
-        </Grid>
-      </form>
-    </Paper>
-  );
-};
 
 export default AdminPage;

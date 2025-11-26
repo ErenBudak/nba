@@ -1,10 +1,10 @@
 package com.nba.nba.service;
 
 import com.nba.nba.dto.CreateRosterDTO;
-import com.nba.nba.config.entity.Roster;
-import com.nba.nba.config.entity.Player;
-import com.nba.nba.config.entity.Team;
-import com.nba.nba.config.entity.Season;
+import com.nba.nba.entity.Roster;
+import com.nba.nba.entity.Player;
+import com.nba.nba.entity.Team;
+import com.nba.nba.entity.Season;
 import com.nba.nba.repository.RosterRepository;
 import com.nba.nba.repository.PlayerRepository;
 import com.nba.nba.repository.TeamRepository;
@@ -12,6 +12,8 @@ import com.nba.nba.repository.SeasonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 public class RosterService {
@@ -27,6 +29,9 @@ public class RosterService {
 
   @Autowired
   private SeasonRepository seasonRepository;
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Transactional
   public Roster createRoster(CreateRosterDTO dto) {
@@ -44,6 +49,9 @@ public class RosterService {
     roster.setJerseyNumber(dto.getJerseyNumber());
     roster.setPosition(dto.getPosition());
 
-    return rosterRepository.save(roster);
+    Roster savedRoster = rosterRepository.save(roster);
+    entityManager.flush();
+    entityManager.refresh(savedRoster);
+    return savedRoster;
   }
 }

@@ -1,6 +1,6 @@
 package com.nba.nba.mapper;
 
-import com.nba.nba.config.entity.Stats;
+import com.nba.nba.entity.Stats;
 import com.nba.nba.dto.StatsDTO;
 import org.springframework.stereotype.Component;
 

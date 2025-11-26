@@ -1,6 +1,6 @@
 package com.nba.nba.mapper;
 
-import com.nba.nba.config.entity.Conference;
+import com.nba.nba.entity.Conference;
 import com.nba.nba.dto.ConferenceDTO;
 import org.springframework.stereotype.Component;
 

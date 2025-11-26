@@ -1,9 +1,7 @@
-package com.nba.nba.config.entity;
+package com.nba.nba.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.nba.nba.config.entity.Player;
-import com.nba.nba.config.entity.Season;
 
 @Entity
 @Table(name = "SEASON_AWARDS", uniqueConstraints = {

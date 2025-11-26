@@ -1,7 +1,7 @@
 package com.nba.nba.repository;
 
-import com.nba.nba.config.entity.UserFavoriteTeam;
-import com.nba.nba.config.entity.UserFavoriteTeamId;
+import com.nba.nba.entity.UserFavoriteTeam;
+import com.nba.nba.entity.UserFavoriteTeamId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

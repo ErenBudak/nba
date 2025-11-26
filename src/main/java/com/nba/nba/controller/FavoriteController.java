@@ -1,16 +1,20 @@
 package com.nba.nba.controller;
 
-import com.nba.nba.config.entity.UserFavoritePlayer;
-import com.nba.nba.config.entity.UserFavoriteTeam;
+import com.nba.nba.entity.UserFavoritePlayer;
+import com.nba.nba.entity.UserFavoriteTeam;
 import com.nba.nba.repository.UserFavoritePlayerRepository;
 import com.nba.nba.repository.UserFavoriteTeamRepository;
+import com.nba.nba.entity.UserFavoritePlayerId;
+import com.nba.nba.entity.UserFavoriteTeamId;
 import com.nba.nba.security.RequireRole;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// favori takım ve oyuncu ekleme controller
+
 @RestController
-@RequestMapping("/favorites")
+@RequestMapping("/api/favorites")
 public class FavoriteController {
 
   private final UserFavoriteTeamRepository favoriteTeamRepository;
@@ -46,5 +50,31 @@ public class FavoriteController {
 
     favoritePlayerRepository.save(fav);
     return ResponseEntity.ok("Player added to favorites");
+  }
+
+  @DeleteMapping("/team/{teamId}")
+  @RequireRole("USER")
+  public ResponseEntity<?> removeFavoriteTeam(@PathVariable Integer teamId, HttpServletRequest request) {
+    Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+
+    UserFavoriteTeamId id = new UserFavoriteTeamId(userId, teamId);
+    if (!favoriteTeamRepository.existsById(id)) {
+      return ResponseEntity.notFound().build();
+    }
+    favoriteTeamRepository.deleteById(id);
+    return ResponseEntity.ok("Team removed from favorites");
+  }
+
+  @DeleteMapping("/player/{playerId}")
+  @RequireRole("USER")
+  public ResponseEntity<?> removeFavoritePlayer(@PathVariable Integer playerId, HttpServletRequest request) {
+    Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+
+    UserFavoritePlayerId id = new UserFavoritePlayerId(userId, playerId);
+    if (!favoritePlayerRepository.existsById(id)) {
+      return ResponseEntity.notFound().build();
+    }
+    favoritePlayerRepository.deleteById(id);
+    return ResponseEntity.ok("Player removed from favorites");
   }
 }
